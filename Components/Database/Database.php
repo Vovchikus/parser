@@ -3,6 +3,8 @@
 namespace Components\Database;
 
 use mysqli;
+use PDO;
+use PDOException;
 
 /**
  * Class Database
@@ -10,67 +12,70 @@ use mysqli;
  */
 class Database
 {
-  /**
-   * @var mysqli
-   */
-  private $connection;
-  /**
-   * @var
-   */
-  private static $_instance;
-  /**
-   * @var string
-   */
-  private $host = "localhost";
-  /**
-   * @var string
-   */
-  private $username = "root";
-  /**
-   * @var string
-   */
-  private $password = "19700505";
-  /**
-   * @var string
-   */
-  private $database = "symfony";
 
-  /**
-   * @return Database
-   */
-  public static function getInstance()
-  {
-    if (!self::$_instance) { // If no instance then make one
-      self::$_instance = new self();
+    private $connection;
+    /**
+     * @var
+     */
+    private static $_instance;
+    /**
+     * @var string
+     */
+    private $host = "localhost";
+    /**
+     * @var string
+     */
+    private $username = "root";
+    /**
+     * @var string
+     */
+    private $password = "19700505";
+    /**
+     * @var string
+     */
+    private $database = "joomla";
+
+    /**
+     * @return Database
+     */
+    public static function getInstance()
+    {
+        if (!self::$_instance) { // If no instance then make one
+            self::$_instance = new self();
+        }
+        return self::$_instance;
     }
-    return self::$_instance;
-  }
 
-  /**
-   * Database constructor.
-   */
-  private function __construct()
-  {
-    $this->connection = new mysqli($this->host, $this->username,
-      $this->password, $this->database);
+    /**
+     * Database constructor.
+     */
+    private function __construct()
+    {
+        $dsn = "mysql:host=" . $this->host . ";dbname=" . $this->database . ";charset=utf8";
+        $opt = array(
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
+        );
 
-    // Error handling
-    if (mysqli_connect_error()) {
-      trigger_error("Failed to connect to MySQL: " . mysqli_connect_error(),
-        E_USER_ERROR);
+        try {
+            $this->connection = new PDO($dsn, $this->username, $this->password, $opt);
+        } catch (PDOException $e) {
+            error_log($e->getMessage());
+            die("A database error was encountered -> " . $e->getMessage());
+        }
+
     }
-  }
 
 
-  private function __clone()
-  {
-  }
+    private function __clone()
+    {
+    }
 
-  /**
-   * @return mysqli
-   */
-  public function getConnection()
-  {
-    return $this->connection;
-  }
+    /**
+     * @return mysqli
+     */
+    public function getConnection()
+    {
+        return $this->connection;
+    }
 }
