@@ -1,10 +1,9 @@
 <?php
 
-namespace Components\Manager\Product;
+namespace Parser\Manager\Product;
 
-use Components\Database\Database;
-use Components\Entity\Product;
-use ReflectionClass;
+use Parser\Database\Database;
+use Parser\Entity\Product;
 
 /**
  * Class ProductManager
@@ -18,18 +17,9 @@ class ProductManager
      */
     private $tableName = 'n58na_virtuemart_products';
 
-    /**
-     * @var Product
-     */
-    private $product;
-
 
     private $pdo;
 
-    /**
-     * ProductManager constructor.
-     * @param Product $product
-     */
     public function __construct(Product $product)
     {
         $this->product = $product;
@@ -62,6 +52,21 @@ class ProductManager
 
             throw $ex;
 
+        }
+
+    }
+
+    public function selectAll()
+    {
+        try {
+            $prepareQuery = $this->pdo->prepare(
+                " SELECT product_sku FROM " . $this->tableName . " ORDER BY virtuemart_product_id DESC;"
+            );
+            $prepareQuery->execute();
+            return $prepareQuery->fetchAll();
+
+        } catch (\Exception $ex) {
+            throw $ex;
         }
 
     }

@@ -1,6 +1,7 @@
 <?php
 
-namespace Components\Entity;
+namespace Parser\Entity;
+use Parser\Manager\Product\ProductManager;
 
 /**
  * Class Product
@@ -8,6 +9,11 @@ namespace Components\Entity;
  */
 class Product
 {
+
+    public function getManager()
+    {
+        return new ProductManager($this);
+    }
 
     /**
      * @var int;
@@ -18,7 +24,6 @@ class Product
      * @var int
      */
     private $virtuemart_vendor_id;
-
 
     /**
      * @var int

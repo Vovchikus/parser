@@ -1,8 +1,7 @@
 <?php
 
-namespace Components\Database;
+namespace Parser\Database;
 
-use mysqli;
 use PDO;
 use PDOException;
 
@@ -13,6 +12,9 @@ use PDOException;
 class Database
 {
 
+    /**
+     * @var PDO
+     */
     private $connection;
     /**
      * @var
@@ -72,7 +74,7 @@ class Database
     }
 
     /**
-     * @return mysqli
+     * @return PDO
      */
     public function getConnection()
     {
