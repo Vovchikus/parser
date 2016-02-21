@@ -33,7 +33,7 @@ class ProductManager
         try {
             $filled = [];
             foreach ($this->product->toArray() as $column => $value) {
-                if ($value) {
+                if ($value !== null) {
                     $filled[$column] = $value;
                 }
             }

@@ -10,11 +10,6 @@ use Parser\Manager\Product\ProductManager;
 class Product
 {
 
-    public function getManager()
-    {
-        return new ProductManager($this);
-    }
-
     /**
      * @var int;
      */
@@ -64,6 +59,11 @@ class Product
      * @var float
      */
     private $product_width;
+
+    /**
+     * @var int
+     */
+    private $published;
 
     /**
      * @param int $virtuemart_product_id
@@ -144,6 +144,16 @@ class Product
     {
         $this->product_width = $product_width;
     }
+
+    /**
+     * @param int $published
+     */
+    public function setPublished($published)
+    {
+        $this->published = $published;
+    }
+
+
 
     public function toArray()
     {

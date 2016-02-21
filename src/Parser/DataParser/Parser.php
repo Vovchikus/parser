@@ -15,34 +15,45 @@ class Parser
         try {
             $reader = new XMLReader();
 
-            if (!$reader->open($fileName)) {
-                throw new \Exception(sprintf('Unable to open file', $fileName));
-            }
+            $file = file_get_contents($fileName);
+
+            $reader->xml($file);
 
             $product = new Product();
             $productManager = new ProductManager($product);
-            $products = $productManager->selectAll();
+            $existProducts = $productManager->selectAll();
 
             $ids = [];
-            foreach ($products as $item) {
-                $ids[] = $item['product_sku'];
+            foreach ($existProducts as $product) {
+                $ids[] = $product['product_sku'];
             }
 
+            while ($reader->read() && $reader->name !== $attributeName) {
+            }
 
-            while ($reader->read()) {
-                switch ($reader->nodeType) {
-                    case(XMLREADER::ELEMENT):
-                        if ($reader->localName == $attributeName) {
-                            $reader->moveToElement();
-                            $element = new SimpleXMLElement($reader->readOuterXml());
-                            if (!in_array($element->vendorCode, $ids)) {
-                                $product->setProductSku($element->vendorCode);
-                                $productManager->insert();
-                            }
-                        }
+            $i = -1;
+
+            while ($reader->name === $attributeName) {
+
+                ++$i;
+                if ($i < 1) {
+
+                    $element = new SimpleXMLElement($reader->readOuterXml());
+                    if (!in_array($element->vendorCode, $ids)) {
+
+                        $product->setProductSku($element->vendorCode);
+                        //Если товар новый - не публикуем
+                        $product->setPublished(0);
+                        $productManager->insert();
+
+                    }
+
+                    $reader->next($attributeName);
+                    continue;
                 }
+
+                $reader->next($attributeName);
             }
-            $reader->close();
 
 
         } catch (\Exception $ex) {
