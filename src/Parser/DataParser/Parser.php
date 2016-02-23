@@ -24,8 +24,8 @@ class Parser
             $existProducts = $productManager->selectAll();
 
             $ids = [];
-            foreach ($existProducts as $product) {
-                $ids[] = $product['product_sku'];
+            foreach ($existProducts as $productItem) {
+                $ids[] = $productItem['product_sku'];
             }
 
             while ($reader->read() && $reader->name !== $attributeName) {
@@ -36,23 +36,36 @@ class Parser
             while ($reader->name === $attributeName) {
 
                 ++$i;
-                if ($i < 1) {
-
+                if ($i < 2) {
                     $element = new SimpleXMLElement($reader->readOuterXml());
+                    //товар новый
                     if (!in_array($element->vendorCode, $ids)) {
-
                         $product->setProductSku($element->vendorCode);
-                        //Если товар новый - не публикуем
+                        //не публикуем
                         $product->setPublished(0);
                         $productManager->insert();
-
+                    //товар существует
+                    } else {
+                        $key = array_search($element->vendorCode, $ids);
+                        unset($ids[$key]);
                     }
-
                     $reader->next($attributeName);
                     continue;
                 }
 
                 $reader->next($attributeName);
+            }
+
+
+            //Есть в базе, но нет в xml (деактивируем)
+            if (!empty($ids)) {
+                foreach($ids as $id){
+                    $product->setProductSku($id);
+                    $product->setPublished(1);
+                    $productManager->update();
+                }
+
+
             }
 
 

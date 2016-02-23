@@ -4,6 +4,7 @@ namespace Parser\Manager\Product;
 
 use Parser\Database\Database;
 use Parser\Entity\Product;
+use PDO;
 
 /**
  * Class ProductManager
@@ -69,6 +70,25 @@ class ProductManager
             throw $ex;
         }
 
+    }
+
+    //todo
+    public function update()
+    {
+
+        try {
+            $prepareQuery = $this->pdo->prepare(
+                "UPDATE " . $this->tableName . " SET published = :published WHERE product_sku = :sku"
+            );
+            $prepareQuery->bindParam(':published', $this->product->getPublished(), PDO::PARAM_INT);
+            $prepareQuery->bindParam(':sku', $this->product->getProductSku(), PDO::PARAM_STR);
+            $prepareQuery->execute();
+
+        } catch (\Exception $ex) {
+
+            throw $ex;
+
+        }
     }
 
 }

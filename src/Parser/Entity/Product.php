@@ -153,6 +153,21 @@ class Product
         $this->published = $published;
     }
 
+    /**
+     * @return int
+     */
+    public function getPublished()
+    {
+        return $this->published;
+    }
+
+    /**
+     * @return string
+     */
+    public function getProductSku()
+    {
+        return $this->product_sku;
+    }
 
 
     public function toArray()
