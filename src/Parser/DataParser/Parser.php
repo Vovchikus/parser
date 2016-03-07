@@ -2,7 +2,7 @@
 
 namespace Parser\DataParser;
 
-use Parser\Entity\Product;
+use Parser\Entity\ProductMap;
 use Parser\Manager\Product\ProductManager;
 use SimpleXMLElement;
 use XMLReader;
@@ -19,7 +19,7 @@ class Parser
 
             $reader->xml($file);
 
-            $product = new Product();
+            $product = new ProductMap();
             $productManager = new ProductManager($product);
             $existProducts = $productManager->selectAll();
 
@@ -36,14 +36,14 @@ class Parser
             while ($reader->name === $attributeName) {
 
                 ++$i;
-                if ($i < 2) {
+                if ($i < 5) {
                     $element = new SimpleXMLElement($reader->readOuterXml());
                     //товар новый
                     if (!in_array($element->vendorCode, $ids)) {
                         $product->setProductSku($element->vendorCode);
                         //не публикуем
                         $product->setPublished(0);
-                        $productManager->insert();
+                        $insertedProductId = $productManager->insert();
                     //товар существует
                     } else {
                         $key = array_search($element->vendorCode, $ids);
@@ -61,7 +61,7 @@ class Parser
             if (!empty($ids)) {
                 foreach($ids as $id){
                     $product->setProductSku($id);
-                    $product->setPublished(1);
+                    $product->setPublished(0);
                     $productManager->update();
                 }
 

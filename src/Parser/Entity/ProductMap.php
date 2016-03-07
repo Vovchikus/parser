@@ -1,13 +1,12 @@
 <?php
 
 namespace Parser\Entity;
-use Parser\Manager\Product\ProductManager;
 
 /**
  * Class Product
  * @package Components\Entity
  */
-class Product
+class ProductMap extends Map
 {
 
     /**
@@ -64,6 +63,8 @@ class Product
      * @var int
      */
     private $published;
+
+    private $relatedCategory;
 
     /**
      * @param int $virtuemart_product_id
@@ -169,7 +170,14 @@ class Product
         return $this->product_sku;
     }
 
+    public function setRelatedCategory(CategoryMap $categoryMap)
+    {
+        $this->relatedCategory = $categoryMap;
+    }
 
+    /**
+     * @return array
+     */
     public function toArray()
     {
         $vars = get_object_vars($this);

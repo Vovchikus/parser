@@ -2,15 +2,15 @@
 
 namespace Parser\Manager\Product;
 
-use Parser\Database\Database;
-use Parser\Entity\Product;
+use Parser\Entity\Map;
+use Parser\Entity\ProductMap;
 use PDO;
 
 /**
  * Class ProductManager
  * @package Components\Manager\Product
  */
-class ProductManager
+class ProductManager extends Manager
 {
 
     /**
@@ -18,50 +18,23 @@ class ProductManager
      */
     private $tableName = 'n58na_virtuemart_products';
 
+    /**
+     * @var ProductMap
+     */
+    private $productMap;
 
-    private $pdo;
-
-    public function __construct(Product $product)
+    public function __construct(ProductMap $productMap)
     {
-        $this->product = $product;
-
-        $db = Database::getInstance();
-        $this->pdo = $db->getConnection();
+        $this->productMap = $productMap;
+        parent::__construct();
     }
 
-    public function insert()
-    {
-        try {
-            $filled = [];
-            foreach ($this->product->toArray() as $column => $value) {
-                if ($value !== null) {
-                    $filled[$column] = $value;
-                }
-            }
-            if (empty($filled)) {
-                throw new \Exception('Nothing to insert');
-            }
-
-            $columnString = implode(',', array_keys($filled));
-            $valueString = implode(',', array_fill(0, count($filled), '?'));
-            $prepareQuery = $this->pdo->prepare(
-                "INSERT INTO " . $this->tableName . " ({$columnString}) VALUES ({$valueString})"
-            );
-            $prepareQuery->execute(array_values($filled));
-
-        } catch (\Exception $ex) {
-
-            throw $ex;
-
-        }
-
-    }
 
     public function selectAll()
     {
         try {
-            $prepareQuery = $this->pdo->prepare(
-                " SELECT product_sku FROM " . $this->tableName . " ORDER BY virtuemart_product_id DESC;"
+            $prepareQuery = $this->getPdo()->prepare(
+                " SELECT product_sku FROM " . $this->getTableName() . " ORDER BY virtuemart_product_id DESC;"
             );
             $prepareQuery->execute();
             return $prepareQuery->fetchAll();
@@ -77,11 +50,11 @@ class ProductManager
     {
 
         try {
-            $prepareQuery = $this->pdo->prepare(
-                "UPDATE " . $this->tableName . " SET published = :published WHERE product_sku = :sku"
+            $prepareQuery = $this->getPdo()->prepare(
+                "UPDATE " . $this->getTableName() . " SET published = :published WHERE product_sku = :sku"
             );
-            $prepareQuery->bindParam(':published', $this->product->getPublished(), PDO::PARAM_INT);
-            $prepareQuery->bindParam(':sku', $this->product->getProductSku(), PDO::PARAM_STR);
+            $prepareQuery->bindParam(':published', $this->getMap()->getPublished(), PDO::PARAM_INT);
+            $prepareQuery->bindParam(':sku', $this->getMap()->getProductSku(), PDO::PARAM_STR);
             $prepareQuery->execute();
 
         } catch (\Exception $ex) {
@@ -91,4 +64,19 @@ class ProductManager
         }
     }
 
+    /**
+     * @return string
+     */
+    public function getTableName()
+    {
+        return $this->tableName;
+    }
+
+    /**
+     * @return ProductMap
+     */
+    public function getMap()
+    {
+        return $this->productMap;
+    }
 }
