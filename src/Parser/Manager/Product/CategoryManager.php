@@ -6,35 +6,43 @@ namespace Parser\Manager\Product;
 use Parser\Entity\CategoryMap;
 use Parser\Entity\Map;
 
-class CategoryManager extends Manager
+/**
+ * Class CategoryManager
+ * @package Parser\Manager\Product
+ */
+class CategoryManager extends DbManager
 {
 
-    /**
-     * @var string
-     */
-    private $tableName = 'n58na_virtuemart_categories';
+    const TABLE_NAME = 'n58na_virtuemart_product_categories';
 
     /**
      * @var CategoryMap
      */
     private $categoryMap;
 
+    /**
+     * @return string
+     */
     public function getTableName()
     {
-        return $this->tableName;
+        return self::TABLE_NAME;
     }
 
+    /**
+     * @param CategoryMap $categoryMap
+     */
     public function __construct(CategoryMap $categoryMap)
     {
         $this->categoryMap = $categoryMap;
         parent::__construct();
     }
 
+
     /**
      * @return Map
      */
     public function getMap()
     {
-        // TODO: Implement getMap() method.
+        return $this->categoryMap;
     }
 }

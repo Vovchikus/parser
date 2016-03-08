@@ -176,6 +176,16 @@ class ProductMap extends Map
     }
 
     /**
+     * @return mixed
+     */
+    public function getRelatedCategory()
+    {
+        return $this->relatedCategory;
+    }
+
+
+
+    /**
      * @return array
      */
     public function toArray()

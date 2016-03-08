@@ -1,12 +1,14 @@
 <?php
 
 namespace Parser\Entity;
+use Parser\Manager\Product\CategoryManager;
 
 /**
  * Class CategoryMap
  * @package Parser\Entity
  */
-class CategoryMap extends Map {
+class CategoryMap extends Map
+{
 
     /**
      * @var integer
@@ -72,8 +74,16 @@ class CategoryMap extends Map {
     }
 
 
+    /**
+     * @return array
+     */
     public function toArray()
     {
-        // TODO: Implement toArray() method.
+        $vars = get_object_vars($this);
+        $result = [];
+        foreach ($vars as $key => $value) {
+            $result[$key] = $value;
+        }
+        return $result;
     }
 }

@@ -6,7 +6,7 @@ namespace Parser\Manager\Product;
 use Parser\Database\Database;
 use Parser\Entity\Map;
 
-abstract class Manager
+abstract class DbManager
 {
 
     /**
@@ -29,6 +29,9 @@ abstract class Manager
         return $this->pdo;
     }
 
+    /**
+     * @return string
+     */
     public abstract function getTableName();
 
     /**

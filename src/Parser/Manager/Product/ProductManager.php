@@ -2,7 +2,7 @@
 
 namespace Parser\Manager\Product;
 
-use Parser\Entity\Map;
+use Parser\Entity\CategoryMap;
 use Parser\Entity\ProductMap;
 use PDO;
 
@@ -10,13 +10,10 @@ use PDO;
  * Class ProductManager
  * @package Components\Manager\Product
  */
-class ProductManager extends Manager
+class ProductManager extends DbManager
 {
 
-    /**
-     * @var string
-     */
-    private $tableName = 'n58na_virtuemart_products';
+    const TABLE_NAME = 'n58na_virtuemart_products';
 
     /**
      * @var ProductMap
@@ -27,6 +24,22 @@ class ProductManager extends Manager
     {
         $this->productMap = $productMap;
         parent::__construct();
+    }
+
+    /**
+     * @return ProductMap
+     */
+    public function getMap()
+    {
+        return $this->productMap;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTableName()
+    {
+        return self::TABLE_NAME;
     }
 
 
@@ -64,19 +77,50 @@ class ProductManager extends Manager
         }
     }
 
-    /**
-     * @return string
-     */
-    public function getTableName()
-    {
-        return $this->tableName;
-    }
 
     /**
-     * @return ProductMap
+     * @param CategoryMap $categoryMap
+     * @throws \Exception
      */
-    public function getMap()
+    public function insertWithRelatedCategory(CategoryMap $categoryMap)
     {
-        return $this->productMap;
+
+        try {
+            $this->getPdo()->beginTransaction();
+
+            $productId = $this->insert();
+
+            $categoryMap->setVirtuemartProductId($productId);
+
+            $filled = [];
+            foreach ($categoryMap->toArray() as $column => $value) {
+                if ($value !== null) {
+                    $filled[$column] = $value;
+                }
+            }
+
+            $columnString = implode(',', array_keys($filled));
+            $valueString = implode(',', array_fill(0, count($filled), '?'));
+
+            $prepareQuery = $this->getPdo()->prepare(
+                "INSERT INTO " . CategoryManager::TABLE_NAME . " ({$columnString}) VALUES ({$valueString})"
+            );
+
+            if(!$prepareQuery->execute(array_values($filled))){
+                throw new \Exception('Cannot execute query');
+            }
+
+            $this->getPdo()->commit();
+
+        } catch (\Exception $ex) {
+
+            $this->getPdo()->rollBack();
+
+            throw $ex;
+
+        }
+
+
     }
+
 }

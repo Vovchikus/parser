@@ -2,6 +2,7 @@
 
 namespace Parser\DataParser;
 
+use Parser\Entity\CategoryMap;
 use Parser\Entity\ProductMap;
 use Parser\Manager\Product\ProductManager;
 use SimpleXMLElement;
@@ -36,14 +37,19 @@ class Parser
             while ($reader->name === $attributeName) {
 
                 ++$i;
-                if ($i < 5) {
+                if ($i < 2) {
                     $element = new SimpleXMLElement($reader->readOuterXml());
                     //товар новый
                     if (!in_array($element->vendorCode, $ids)) {
                         $product->setProductSku($element->vendorCode);
                         //не публикуем
                         $product->setPublished(0);
-                        $insertedProductId = $productManager->insert();
+
+                        $category = new CategoryMap();
+                        $category->setVirtuemartCategoryId(95);
+
+                        $productManager->insertWithRelatedCategory($category);
+
                     //товар существует
                     } else {
                         $key = array_search($element->vendorCode, $ids);
