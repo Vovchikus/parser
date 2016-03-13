@@ -40,6 +40,10 @@ abstract class DbManager
     public abstract function getMap();
 
 
+    /**
+     * @return string
+     * @throws \Exception
+     */
     public function insert()
     {
         try {
@@ -58,7 +62,9 @@ abstract class DbManager
             $prepareQuery = $this->getPdo()->prepare(
                 "INSERT INTO " . $this->getTableName() . " ({$columnString}) VALUES ({$valueString})"
             );
-            $prepareQuery->execute(array_values($filled));
+            if (!$prepareQuery->execute(array_values($filled))) {
+                throw new \Exception('Cannot execute query');
+            }
             return $this->getPdo()->lastInsertId();
 
         } catch (\Exception $ex) {
@@ -68,7 +74,6 @@ abstract class DbManager
         }
 
     }
-
 
 
 }

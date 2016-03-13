@@ -15,6 +15,11 @@ class ProductManager extends DbManager
 
     const TABLE_NAME = 'n58na_virtuemart_products';
 
+    public static $ignoreVendors = [
+        'ANYDAY', 'ELEGANZZA', 'LABBRA', 'FELICITA', 'COLLAGE', 'PALIO', 'PIMOBETTI', 'ROBASTO', 'TONELLI', 'MODO GRU',
+        'MODO'
+    ];
+
     /**
      * @var ProductMap
      */
@@ -84,9 +89,10 @@ class ProductManager extends DbManager
      */
     public function insertWithRelatedCategory(CategoryMap $categoryMap)
     {
+        $this->getPdo()->beginTransaction();
+        $this->getPdo()->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
         try {
-            $this->getPdo()->beginTransaction();
 
             $productId = $this->insert();
 
@@ -106,7 +112,7 @@ class ProductManager extends DbManager
                 "INSERT INTO " . CategoryManager::TABLE_NAME . " ({$columnString}) VALUES ({$valueString})"
             );
 
-            if(!$prepareQuery->execute(array_values($filled))){
+            if (!$prepareQuery->execute(array_values($filled))) {
                 throw new \Exception('Cannot execute query');
             }
 

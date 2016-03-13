@@ -14,6 +14,7 @@ class CategoryManager extends DbManager
 {
 
     const TABLE_NAME = 'n58na_virtuemart_product_categories';
+    const NEW_PRODUCT_CATEGORY_ID = 96;
 
     /**
      * @var CategoryMap
