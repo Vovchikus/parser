@@ -20,71 +20,46 @@ class Parser
             $file = file_get_contents($fileName);
 
             $reader->xml($file);
-
             $product = new ProductMap();
             $productManager = new ProductManager($product);
             $existProducts = $productManager->selectAll();
-
             $ids = [];
             foreach ($existProducts as $productItem) {
                 $ids[] = $productItem['product_sku'];
             }
-
             while ($reader->read() && $reader->name !== $attributeName) {
             }
-
             $i = -1;
-
             while ($reader->name === $attributeName) {
-
                 ++$i;
-                if ($i < 2) {
-                    $element = new SimpleXMLElement($reader->readOuterXml());
-
-                    if(in_array(strtoupper($element->vendor), ProductManager::$ignoreVendors)){
-                        continue;
-                    }
-
-                    //товар новый
-                    if (!in_array($element->vendorCode, $ids)) {
-                        $product->setProductSku($element->vendorCode);
-                        //не публикуем
-                        $product->setPublished(0);
-
-                        $category = new CategoryMap();
-                        $category->setVirtuemartCategoryId(CategoryManager::NEW_PRODUCT_CATEGORY_ID);
-
-                        $productManager->insertWithRelatedCategory($category);
-
-                    //товар существует
-                    } else {
-                        $key = array_search($element->vendorCode, $ids);
-                        unset($ids[$key]);
-                    }
-                    $reader->next($attributeName);
+                $element = new SimpleXMLElement($reader->readOuterXml());
+                if (in_array(strtoupper($element->vendor), ProductManager::$ignoreVendors)) {
                     continue;
                 }
+                if (!in_array($element->vendorCode, $ids)) {
+                    $product->setProductSku($element->vendorCode);
+                    $product->setPublished();
+                    $category = new CategoryMap();
+                    $category->setVirtuemartCategoryId(CategoryManager::NEW_PRODUCT_CATEGORY_ID);
+                    $productManager->insertWithRelatedCategory($category);
 
+                } else {
+                    $key = array_search($element->vendorCode, $ids);
+                    unset($ids[$key]);
+                }
                 $reader->next($attributeName);
             }
 
-
-            //Есть в базе, но нет в xml (деактивируем)
             if (!empty($ids)) {
-                foreach($ids as $id){
+                foreach ($ids as $id) {
                     $product->setProductSku($id);
-                    $product->setPublished(0);
+                    $product->setPublished();
                     $productManager->update();
                 }
-
-
             }
-
-
         } catch (\Exception $ex) {
 
-            print_r($ex->getMessage());
-            die;
+            throw $ex;
 
         }
 

@@ -147,9 +147,9 @@ class ProductMap extends Map
     }
 
     /**
-     * @param int $published
+     * @param bool $published
      */
-    public function setPublished($published)
+    public function setPublished($published = true)
     {
         $this->published = $published;
     }
@@ -184,7 +184,6 @@ class ProductMap extends Map
     }
 
 
-
     /**
      * @return array
      */
@@ -197,8 +196,6 @@ class ProductMap extends Map
         }
         return $result;
     }
-
-
 
 
 }

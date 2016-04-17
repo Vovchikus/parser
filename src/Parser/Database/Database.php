@@ -23,19 +23,19 @@ class Database
     /**
      * @var string
      */
-    private $host = "localhost";
+    private $host = "";
     /**
      * @var string
      */
-    private $username = "root";
+    private $username = "";
     /**
      * @var string
      */
-    private $password = "19700505";
+    private $password = "";
     /**
      * @var string
      */
-    private $database = "joomla";
+    private $database = "";
 
     /**
      * @return Database
