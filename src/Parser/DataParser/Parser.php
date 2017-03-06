@@ -11,7 +11,6 @@ use XMLReader;
 
 class Parser
 {
-
     public function parseAttribute($fileName, $attributeName)
     {
         try {
@@ -58,12 +57,7 @@ class Parser
                 }
             }
         } catch (\Exception $ex) {
-
             throw $ex;
-
         }
-
     }
-
-
 }
